@@ -1,0 +1,4 @@
+interface:
+  display_name: "Write Kanban Card"
+  short_description: "Crie textos claros para cards Kanban"
+  default_prompt: "Use $write-kanban-card para criar o texto de um card de tarefa Kanban."
