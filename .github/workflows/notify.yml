@@ -1,0 +1,39 @@
+name: notify
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  discord:
+    runs-on: ubuntu-22.04
+    env:
+      DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+    steps:
+      - name: Notify Discord when configured
+        if: ${{ env.DISCORD_WEBHOOK != '' }}
+        env:
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_LINK: ${{ github.event.pull_request.html_url }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          payload="$(jq -n \
+            --arg content "New pull request #${PR_NUMBER}" \
+            --arg description "${PR_TITLE}" \
+            --arg url "${PR_LINK}" \
+            --arg author "${PR_AUTHOR}" \
+            --arg repository "${REPOSITORY}" \
+            '{content: $content, embeds: [{
+              title: $description,
+              url: $url,
+              fields: [
+                {name: "Author", value: $author, inline: true},
+                {name: "Repository", value: $repository, inline: true}
+              ]
+            }]}')"
+          curl --fail-with-body \
+            --header "Content-Type: application/json" \
+            --data "$payload" \
+            "$DISCORD_WEBHOOK"
