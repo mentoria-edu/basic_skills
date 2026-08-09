@@ -1,0 +1,4 @@
+interface:
+  display_name: "Jira MCP"
+  short_description: "Manage Jira issues on a Kanban board via Atlassian MCP"
+  default_prompt: "Use $jira-mcp to view, create, or update Jira tickets on your Kanban board."
