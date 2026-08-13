@@ -36,9 +36,16 @@ When a user mentions an issue key in conversation, use `mcp__atlassian__getJiraI
 
 ## Custom Fields & Localization Rules (CRITICAL)
 
-**1. Localization & Translation:**
-- **NEVER** translate Jira field names in API requests or user communications. Even if the user speaks in Portuguese or another language, the field names must be treated as English (e.g., "Change Level", not "Nível de Mudança").
-- Use the provided field name only to locate its ID. Once located, exclusively use the `customfield_XXXXX` format for API calls.
+**1. Language Enforcement (CRITICAL TRAP):**
+- The Jira API returns field names translated based on the user's personal account preferences.
+- When fetching issue details (`mcp__atlassian__getJiraIssue`) or metadata (`mcp__atlassian__getJiraProjectIssueTypesMetadata`), **ALWAYS inspect the field names in the payload**.
+- If you detect field names in a language other than English (e.g., Portuguese terms like "Nível de Mudança", "O que?", "Por quê?", "Critérios de Aceitação"), **STOP IMMEDIATELY**.
+- Do NOT attempt to proceed, map, or translate the fields yourself.
+- Reply to the user instructing them to fix their language:
+
+```text
+I detected that your Jira account language is not set to English. To use this integration correctly, please go to your Atlassian Account Settings, change your language preference to 'English (US)' or 'English (UK)', and then we can try again.
+```
 
 **2. Hardcoded Field IDs:**
 When working with these specific fields, use the mapped IDs directly to save time and tokens:
@@ -48,11 +55,12 @@ When working with these specific fields, use the mapped IDs directly to save tim
 - **Why?** -> `customfield_10043` (Rich Text)
 
 **3. Creation Rules:**
-- **Tasks & Subtasks:** `Change Level` (`customfield_10042`) is strictly **REQUIRED**.
-  - Valid options: `Trivial`, `Operational`, `Functional`, `Structural`, `Emergency`.
-  - **Do NOT infer or guess** this value. If the user requests a task/subtask creation but omits the Change Level, **STOP** and ask the user to provide it.
-- **Epics & Stories:** Do **NOT** use the `Change Level` field for Epics and Stories.
-- **Optional Fields:** `What?`, `Why?`, and `Acceptance Criteria` are **OPTIONAL** for all issue types. If the user does not provide them in their request, simply skip them. Do NOT ask the user to provide them.
+- **Tasks & Subtasks (REQUIRED Fields):** The fields `Change Level` (`customfield_10042`), `What?` (`customfield_10045`), `Why?` (`customfield_10043`), and `Acceptance Criteria` (`customfield_10044`) are strictly **REQUIRED**.
+  - Valid `Change Level` options: `Trivial`, `Operational`, `Functional`, `Structural`, `Emergency`.
+  - **Do NOT infer or guess** these values. If the user requests a task/subtask creation but omits any of these fields, **STOP** and ask the user to provide the missing information before proceeding.
+- **Epics & Stories:**
+  - Do **NOT** use the `Change Level` field.
+  - The fields `What?`, `Why?`, and `Acceptance Criteria` are **OPTIONAL**. If the user does not provide them in their request, simply skip them. Do NOT ask the user to provide them.
 
 **4. Dynamic Field Resolution:**
 If the user provides a field name that is not hardcoded above (or if the ID is missing), you must find its ID first before interacting with it. All custom field IDs must match the regex `^customfield_\d+$`.
