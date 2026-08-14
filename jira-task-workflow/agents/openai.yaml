@@ -1,0 +1,4 @@
+interface:
+  display_name: "Jira Task Workflow"
+  short_description: "Manage Jira Task and Subtask lifecycles"
+  default_prompt: "Use $jira-task-workflow to create, update, or transition a Jira Task safely."
