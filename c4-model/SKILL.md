@@ -1,161 +1,112 @@
 ---
 name: c4-model
-description: Use when creating, reviewing, or updating C4 Model diagrams in Mermaid, including Context, Container, Component, architecture documentation, system boundaries, users, external systems, and relationships.
+description: "Create, update, and review C4 Model architecture diagrams in Mermaid. Use for system context, container, or component diagrams; architecture documentation; system boundaries; people, external systems, data stores, queues, and integrations; or for reviewing diagram scope, relationships, and visual conventions."
 ---
 
 # C4 Model Mermaid
 
-Use this skill to create, review, or update C4 Model architecture diagrams with Mermaid as the default output format.
-
-## When To Use
-
-Use this skill when the user asks for C4, architecture diagrams, system context, container diagrams, component diagrams, Mermaid architecture docs, system boundaries, integrations, users, external systems, or relationship mapping.
-
-Do not use this skill for generic flowcharts unless the user explicitly wants a C4-style architecture view or Mermaid fallback.
-
-## Default Output
-
-Default to Mermaid fenced blocks in Markdown:
-
-````markdown
-```mermaid
-C4Context
-...
-```
-````
-
-Prefer Mermaid C4 syntax when the target renderer supports it:
-
-- `C4Context` for system context.
-- `C4Container` for containers and major runtime/deployable units.
-- `C4Component` for internals of one container.
-
-If Mermaid C4 is not supported by the target renderer, use a `flowchart` fallback with C4 naming conventions.
+Create clear, single-level C4 diagrams in Mermaid. Prefer the smallest level that answers the request, then state assumptions only when needed.
 
 ## Workflow
 
-1. Identify the system in focus.
-2. Choose the smallest C4 level that answers the user's question.
-3. Ask only for missing information that blocks a useful diagram.
-4. Keep one C4 abstraction level per diagram.
-5. Label relationships with clear verbs or short phrases.
-6. Add a short explanation or assumptions list when helpful.
-7. Include boundaries for teams, trust zones, platforms, or deployment contexts when relevant.
+1. Identify the system in focus, its users, and the relevant external systems.
+2. Choose one C4 level for each diagram.
+3. Model responsibilities and relationships before choosing technologies or layout details.
+4. Use native Mermaid C4 syntax when the target renderer supports it; otherwise use the flowchart fallback.
+5. Add boundaries only when they clarify ownership, trust, deployment, or architectural domains.
+6. Review the diagram against the checklist before delivering it.
 
-## Level Selection
+Ask only for information that prevents a useful diagram. Make reasonable assumptions explicit rather than blocking on minor gaps.
 
-Use `C4Context` when the user wants the big picture:
+## Choose the C4 level
 
-- users/personas
-- system in focus
-- external systems
-- high-level integrations
+| Level | Use it to show | Include | Exclude |
+| --- | --- | --- | --- |
+| Context (`C4Context`) | The big picture | People, system in focus, external systems, high-level integrations | Technologies, internal containers, implementation details |
+| Container (`C4Container`) | The main runtime or deployable parts of one system | Apps, APIs, workers, databases, queues, object stores, and their technologies | Internal module details |
+| Component (`C4Component`) | The internals of one container | Controllers, services, repositories, adapters, schedulers, and modules | Other containers' internals |
 
-Use `C4Container` when the user wants the system's main parts:
+Create a Code or UML class diagram only when the user explicitly requests class-, interface-, or function-level design.
 
-- applications
-- APIs
-- workers
-- databases
-- queues
-- object stores
-- command gateways
+## Model elements and relationships
 
-Use `C4Component` when the user wants details inside one container:
+- Use `Person` for a human role and `System` for the system in focus.
+- Use `System_Ext` for external systems. Do not present a data store as an external actor merely because it is a dependency.
+- Use `Container` for applications, APIs, workers, and services; use `ContainerDb` for databases, queues, and object stores at the container level.
+- Use `Component` for a responsibility inside a selected container.
+- Give elements concrete, functional names. Avoid vague names such as `Service`, `API`, or `DB` without a purpose.
+- In Context diagrams, omit technologies. In Container diagrams, include a technology when it improves understanding. In Component diagrams, emphasize responsibility over implementation detail.
+- Make each relationship directional and label it with a concise verb plus object, such as `Reads orders`, `Publishes events`, or `Authenticates users`.
+- Avoid labels such as `Data`, `Flow`, `Communication`, or `Integration` because they do not explain the relationship.
 
-- modules
-- services
-- controllers
-- repositories
-- adapters
-- schedulers
+## Native Mermaid C4 output
 
-Use Code-level diagrams only when the user explicitly asks for class/function-level design. C4 Code diagrams are usually too detailed for architecture documentation.
-
-## Mermaid Guidelines
-
-Prefer stable identifiers and readable labels:
-
-```mermaid
-C4Context
-title System Context diagram for Data Platform Lite
-
-Person(data_engineer, "Data Engineer", "Builds and runs local data jobs")
-System(data_platform, "Data Platform Lite", "Local Spark and MinIO platform for development and testing")
-System_Ext(ai_agent, "AI Agent", "Requests approved Spark operations through the command gateway")
-
-Rel(data_engineer, data_platform, "Develops and validates jobs")
-Rel(ai_agent, data_platform, "Submits approved Spark commands")
-```
-
-Use boundaries when they clarify ownership or trust:
+Wrap native C4 diagrams in a Mermaid fenced block. Use stable identifiers and readable labels.
 
 ```mermaid
 C4Container
-title Container diagram for AI-controlled local data platform
+title Container diagram for Order Platform
 
-Person(data_engineer, "Data Engineer", "Develops and validates jobs")
-System_Boundary(platform, "Data Platform Lite") {
-  Container(agent, "AI Agent Sandbox", "Firejail", "Runs the AI agent with restricted access")
-  Container(gateway, "Infra Gateway", "FastAPI", "Accepts only approved Spark commands")
-  Container(spark, "Spark Master", "Apache Spark", "Runs Spark applications")
-  ContainerDb(minio, "MinIO", "S3-compatible object store", "Stores local data and Spark logs")
+Person(customer, "Customer", "Places and tracks orders")
+System_Ext(payment_provider, "Payment Provider", "Authorizes card payments")
+
+System_Boundary(order_platform, "Order Platform") {
+  Container(web_app, "Customer Web App", "React", "Lets customers manage orders")
+  Container(order_api, "Order API", "Java", "Creates and manages orders")
+  ContainerDb(order_db, "Order Database", "PostgreSQL", "Stores orders and payments")
 }
 
-Rel(data_engineer, agent, "Uses")
-Rel(agent, gateway, "Calls approved commands", "HTTP")
-Rel(gateway, spark, "Executes spark-submit and status checks")
-Rel(spark, minio, "Reads and writes data", "S3A")
+Rel(customer, web_app, "Places orders")
+Rel(web_app, order_api, "Sends order requests", "HTTPS")
+Rel(order_api, payment_provider, "Authorizes payments", "HTTPS")
+Rel(order_api, order_db, "Stores orders", "JDBC")
 ```
 
-Avoid:
+Keep Context, Container, and Component concerns separate. Prefer one diagram per abstraction level rather than combining them.
 
-- mixing Context, Container, and Component concerns in one diagram
-- unnamed relationships
-- implementation details in Context diagrams
-- databases represented as external actors
-- ambiguous names like `service`, `api`, or `db` without context
+## Flowchart fallback
 
-## Fallback Flowchart
+When native Mermaid C4 syntax is unavailable, preserve the same semantics in a `flowchart`:
 
-If Mermaid C4 is unavailable, use `flowchart` while preserving C4 semantics:
+- Use rectangles for systems, applications, services, and components.
+- Use cylinders for databases, queues, object stores, and other storage.
+- Use circles for people or consuming actors.
+- Use `subgraph` for system, trust, ownership, or domain boundaries.
+- Use solid, labelled arrows for communication, actions, and read/write operations.
 
 ```mermaid
 flowchart LR
-  user["Person: Data Engineer"]
-  subgraph platform["System Boundary: Data Platform Lite"]
-    agent["Container: AI Agent Sandbox\nFirejail"]
-    gateway["Container: Infra Gateway\nFastAPI"]
-    spark["Container: Spark Master\nApache Spark"]
-    minio[("ContainerDb: MinIO\nS3-compatible storage")]
+  customer(("Customer\n[Person]\nPlaces and tracks orders"))
+  payment["Payment Provider\n[External System]\nAuthorizes card payments"]
+
+  subgraph platform["Order Platform"]
+    web["Customer Web App\n[Container: React]\nLets customers manage orders"]
+    api["Order API\n[Container: Java]\nCreates and manages orders"]
+    db[("Order Database\n[ContainerDb: PostgreSQL]\nStores orders and payments")]
   end
 
-  user -->|Uses| agent
-  agent -->|Calls approved commands over HTTP| gateway
-  gateway -->|Executes approved Spark operations| spark
-  spark -->|Reads/writes data| minio
+  customer -->|Places orders| web
+  web -->|Sends order requests| api
+  api -->|Authorizes payments| payment
+  api -->|Stores orders| db
 ```
 
-## Review Checklist
+Use line breaks in fallback labels to make the name, C4 type, technology when relevant, and responsibility easy to scan. Use a dashed boundary only when the target style supports it and the boundary needs emphasis.
 
-Check C4 diagrams for these issues:
+## Review checklist
 
-- The system in focus is explicit.
-- The selected C4 level matches the user's question.
-- Actors, systems, containers, and components are not mixed incorrectly.
-- Every relationship has direction and purpose.
-- External systems are marked as external.
-- Databases, queues, and object stores are modeled at the container level.
-- Trust boundaries and sensitive-data boundaries are visible when relevant.
-- Security-sensitive services are not shown as directly accessible if access is mediated.
-- Diagram labels describe responsibilities, not only technologies.
+Check the following before presenting or approving a diagram:
 
-## Response Style
+- Make the system in focus explicit.
+- Match the C4 level to the question and avoid mixing levels.
+- Distinguish people, systems, containers, components, and storage correctly.
+- Mark external systems as external.
+- Give every relationship direction and purpose.
+- Use boundaries only where ownership, trust, deployment, or a domain distinction matters.
+- Show sensitive services through their intended access path instead of implying direct access.
+- Keep Context diagrams technology-free and implementation-light.
+- Prefer labels that describe responsibilities, not only technologies.
 
-When producing a diagram, keep the response concise:
+## Response style
 
-1. State the selected C4 level.
-2. Provide the Mermaid diagram.
-3. List important assumptions or gaps only if needed.
-
-When reviewing a diagram, lead with findings ordered by severity and include specific fixes.
+For a new diagram, state the selected C4 level, provide the Mermaid block, and list only material assumptions or gaps. For a review, lead with findings ordered by severity and give a specific correction for each finding.
