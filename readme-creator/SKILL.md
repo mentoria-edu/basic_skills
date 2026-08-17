@@ -29,9 +29,6 @@ auditing, or updating a README.
 4. Distinguish verified facts from missing information. Ask the user only for required facts
    that cannot be discovered after a reasonable inspection.
 
-When essential information needed to complete the README is missing, ask the user for it before
-writing. Never invent, infer, or assume project facts to fill those gaps.
-
 Do not invent commands, files, owners, infrastructure, access requirements, coverage targets,
 release policies, inputs, or outputs. Do not insert automatic placeholders as substitutes for
 missing facts.
@@ -43,7 +40,8 @@ needed by the required sections. Treat missing purpose, audience, problem, setup
 tests, supported use cases, contribution process, quality policy, versioning, release process, or
 breaking-change policy as blocking information.
 
-- Stop before editing and ask focused questions for the missing facts.
+- Stop before editing and collect the missing facts through the sequential questioning workflow
+  below.
 - Do not create a best-effort README that describes required information as absent.
 - Do not convert an empty package, import check, directory name, or lack of configuration into a
   supported use case, audience, setup workflow, or contribution policy.
@@ -51,6 +49,28 @@ breaking-change policy as blocking information.
   the repository or user defines them.
 - Treat absence of evidence as unknown information, not proof that no credentials, services,
   dependencies, policies, or requirements exist.
+
+### Collect missing facts sequentially
+
+For a create or update request with missing mandatory facts:
+
+1. Build an internal ordered list of the missing facts, but do not show the complete list to the
+   user.
+2. Ask exactly one focused question in each response. Never combine multiple questions, topics,
+   or missing facts in the same response.
+3. After asking the question, stop and wait for the next user message before asking anything else
+   or editing the README. If a structured user-input tool is available, submit exactly one
+   question per tool call.
+4. Evaluate the answer against repository evidence. If it is incomplete or ambiguous, ask
+   exactly one follow-up question about the same fact and wait again.
+5. Once the current fact is resolved, ask exactly one question for the next highest-priority
+   missing fact and wait for the answer.
+6. Repeat until every mandatory fact is resolved. Do not summarize or preview the questions that
+   remain.
+7. After the final answer resolves the final missing fact, resume the workflow automatically and
+   create or update the README without requiring the user to invoke the skill again.
+
+Never invent, infer, or assume project facts to fill missing information.
 
 During a review-only audit, report these gaps as findings instead of asking questions unless the
 user also requests a corrected README.
