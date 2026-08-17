@@ -29,6 +29,9 @@ auditing, or updating a README.
 4. Distinguish verified facts from missing information. Ask the user only for required facts
    that cannot be discovered after a reasonable inspection.
 
+When essential information needed to complete the README is missing, ask the user for it before
+writing. Never invent, infer, or assume project facts to fill those gaps.
+
 Do not invent commands, files, owners, infrastructure, access requirements, coverage targets,
 release policies, inputs, or outputs. Do not insert automatic placeholders as substitutes for
 missing facts.
