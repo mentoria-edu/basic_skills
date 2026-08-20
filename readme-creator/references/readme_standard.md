@@ -32,6 +32,16 @@ and multi-persona platforms.
 - Keep examples minimal, executable, and validated when local safe execution is possible.
 - Include all required sections. Include `Personas and Responsibilities` only for repositories
   with multiple collaborating teams or distinct personas.
+- Give every heading direct, repository-specific content that fulfills exactly what the heading
+  promises and meets the requirements for that section in this reference. Child headings do not
+  count as content for their parent heading.
+- Treat a heading as empty when it is followed immediately by another heading or end of file, or
+  when its body does not answer the subject indicated by the heading. Warnings, disclaimers,
+  editorial notes, future promises, `TODO`, `TBD`, `N/A`, placeholders, and statements that
+  information is missing never count as section content.
+- When evidence cannot supply the content promised by a required heading, stop before writing and
+  ask the user one focused question whose answer will provide the missing information. Resolve
+  multiple gaps one question at a time. Omit an optional heading when it is not applicable.
 - Treat absence of evidence as unknown information, not proof that a dependency, credential,
   service, workflow, policy, or requirement does not exist.
 
@@ -201,6 +211,9 @@ Do not infer organizational ownership solely from directory names or commit hist
 - Confirm that the title and summary answer what, who, and why.
 - Confirm that the index matches the headings and anchors.
 - Confirm that all required sections contain repository-specific information.
+- Confirm that every heading has direct content that fulfills exactly what it promises before the
+  next heading, and that no parent heading relies only on its child headings, warnings, editorial
+  notes, future promises, or absence statements for content.
 - Confirm that the personas section appears only when applicable.
 - Confirm that commands, paths, links, and policies match inspected evidence.
 - Confirm that every mandatory fact was verified or provided by the user before writing.

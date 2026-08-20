@@ -79,6 +79,19 @@ user also requests a corrected README.
 
 - Write all README headings and prose in English.
 - Use the required sections and ordering from the reference.
+- Give every heading direct, repository-specific content that fulfills exactly what the heading
+  promises and satisfies the corresponding requirements in the reference. Use at least one
+  relevant paragraph, list, table, or code block before the next heading; do not count child
+  headings as content for their parent heading.
+- Treat a heading as empty when it is followed immediately by another heading or end of file, or
+  when its body does not answer the subject indicated by the heading. Warnings, disclaimers,
+  editorial notes, promises of future documentation, placeholders such as `TODO`, `TBD`, or
+  `N/A`, and statements that information is missing never count as section content.
+- When verified evidence cannot supply the content promised by a required heading, do not create
+  or retain that heading with substitute text. Treat the fact as blocking and ask the user one
+  focused question whose answer will supply the missing content. Wait for the answer and resolve
+  all such gaps one question at a time before editing. Omit an optional heading when it is not
+  applicable instead of leaving it empty.
 - Include `Personas and Responsibilities` only when evidence shows that multiple teams or
   personas collaborate in the repository.
 - Keep the index synchronized with the headings actually present. Use valid lowercase Markdown
@@ -119,6 +132,10 @@ during a review-only request.
 ## Validate
 
 - Check headings, index anchors, relative links, paths, and fenced code blocks.
+- Check every heading independently and confirm that its direct content answers exactly what the
+  heading promises before the next heading. Do not approve a README whose parent headings rely
+  only on populated subsections or whose body substitutes warnings or absence statements for the
+  expected information.
 - Run relevant local, safe, non-destructive commands when practical to validate installation,
   minimal execution, and test instructions.
 - Do not install dependencies, use credentials, contact external services, start persistent
