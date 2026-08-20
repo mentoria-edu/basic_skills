@@ -1,0 +1,4 @@
+interface:
+  display_name: "README Creator"
+  short_description: "Create and review standardized README files"
+  default_prompt: "Use $readme-creator to create or review a repository README.md against the team standard."
